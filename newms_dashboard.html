@@ -2,74 +2,161 @@
 <html>
 <head>
   <meta charset="utf-8"/>
-  <title>NEWMS Web Dashboard</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>NEWMS Weather Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
   <style>
-    body{font-family: Arial, Helvetica, sans-serif; max-width:900px;margin:20px auto;}
-    .card{border-radius:8px;padding:16px;margin:12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.12);}
-    .row{display:flex;gap:12px;flex-wrap:wrap;}
-    .col{flex:1;min-width:220px;}
-    h1{margin:0 0 8px 0;}
-    .value{font-size:28px;font-weight:700;}
-    .btn{padding:10px 16px;border-radius:6px;border:0;cursor:pointer;}
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #f1f5f9;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 32px;
+      letter-spacing: 1px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .sensor-box {
+      text-align: center;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      transition: 0.3s;
+    }
+
+    .sensor-box:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    .sensor-label {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .sensor-value {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      margin-left: 5px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      background: #3b82f6;
+      transition: 0.25s;
+    }
+
+    .btn:hover {
+      background: #2563eb;
+    }
+
+    .btn.red {
+      background: #ef4444;
+    }
+
+    .btn.red:hover {
+      background: #dc2626;
+    }
+
+    #status {
+      font-weight: bold;
+      color: #38bdf8;
+    }
   </style>
+
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
-  <h1>NEWMS Web Dashboard</h1>
 
-  <div class="card">
-    <div class="row">
-      <div class="col">
-        <div>Temperature</div>
-        <div id="temp" class="value">-- °C</div>
-      </div>
-      <div class="col">
-        <div>Humidity</div>
-        <div id="hum" class="value">-- %</div>
-      </div>
-      <div class="col">
-        <div>Pressure</div>
-        <div id="pres" class="value">-- hPa</div>
-      </div>
-      <div class="col">
-        <div>Altitude</div>
-        <div id="alt" class="value">-- m</div>
-      </div>
+<h1>🌤 NEWMS Weather Dashboard</h1>
+
+<!-- SENSOR PANEL -->
+<div class="card">
+  <div class="grid">
+    <div class="sensor-box">
+      <div class="sensor-label">Temperature</div>
+      <div id="temp" class="sensor-value">-- °C</div>
+    </div>
+
+    <div class="sensor-box">
+      <div class="sensor-label">Humidity</div>
+      <div id="hum" class="sensor-value">-- %</div>
+    </div>
+
+    <div class="sensor-box">
+      <div class="sensor-label">Pressure</div>
+      <div id="pres" class="sensor-value">-- hPa</div>
+    </div>
+
+    <div class="sensor-box">
+      <div class="sensor-label">Altitude</div>
+      <div id="alt" class="sensor-value">-- m</div>
     </div>
   </div>
+</div>
 
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div><strong>LED Control</strong></div>
-      <div>
-        <button id="ledOn" class="btn">Turn ON</button>
-        <button id="ledOff" class="btn">Turn OFF</button>
-      </div>
-    </div>
+<!-- LED CONTROL -->
+<div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+  <strong>LED Control</strong>
+  <div>
+    <button id="ledOn" class="btn">Turn ON</button>
+    <button id="ledOff" class="btn red">Turn OFF</button>
   </div>
+</div>
 
-  <div class="card">
-    <div>Status: <span id="status">disconnected</span></div>
-  </div>
+<!-- CONNECTION STATUS -->
+<div class="card">
+  MQTT Status: <span id="status">disconnected</span>
+</div>
 
 <script>
-  // --- CONFIG: use your HiveMQ WebSocket endpoint and credentials ---
+  // MQTT CONFIG
   const host = "e1bf1fc970844046bc62def2d86789c0.s1.eu.hivemq.cloud";
-  const wsPort = 8884; // HiveMQ Cloud websockets TLS port
+  const wsPort = 8884;
   const username = "esp32_client";
   const password = "Esp123456";
 
   const mqttUrl = `wss://${host}:${wsPort}/mqtt`;
 
   const client = mqtt.connect(mqttUrl, {
-    username: username,
-    password: password,
+    username,
+    password,
     reconnectPeriod: 2000,
-    connectTimeout: 30 * 1000,
     clean: true
   });
 
+  // TOPICS
   const topicTemp = "newms/weather/temperature";
   const topicHum  = "newms/weather/humidity";
   const topicPres = "newms/weather/pressure";
@@ -77,42 +164,43 @@
   const topicLed  = "newms/device/led";
   const topicStatus = "newms/device/status";
 
-  const elTemp = document.getElementById('temp');
-  const elHum  = document.getElementById('hum');
-  const elPres = document.getElementById('pres');
-  const elAlt  = document.getElementById('alt');
-  const elStatus = document.getElementById('status');
+  // DOM
+  const elTemp = document.getElementById("temp");
+  const elHum  = document.getElementById("hum");
+  const elPres = document.getElementById("pres");
+  const elAlt  = document.getElementById("alt");
+  const elStatus = document.getElementById("status");
 
-  client.on('connect', function () {
-    elStatus.textContent = 'connected';
-    client.subscribe([topicTemp, topicHum, topicPres, topicAlt, topicStatus], function(err) {
-      if (!err) console.log('subscribed to topics');
-    });
-  });
+  // CONNECTION
+  client.on("connect", () => {
+    elStatus.textContent = "connected";
+    elStatus.style.color = "#22c55e";
 
-  client.on('reconnect', () => elStatus.textContent = 'reconnecting');
-  client.on('disconnect', () => elStatus.textContent = 'disconnected');
-  client.on('error', (err) => {
-    console.error('MQTT error', err);
-    elStatus.textContent = 'error';
+    client.subscribe([topicTemp, topicHum, topicPres, topicAlt, topicStatus]);
   });
 
-  client.on('message', function (topic, message) {
-    const m = message.toString();
-    if (topic === topicTemp) elTemp.textContent = m + ' °C';
-    if (topic === topicHum)  elHum.textContent  = m + ' %';
-    if (topic === topicPres) elPres.textContent = m + ' hPa';
-    if (topic === topicAlt)  elAlt.textContent  = m + ' m';
-    if (topic === topicStatus) console.log('status:', m);
+  client.on("reconnect", () => {
+    elStatus.textContent = "reconnecting...";
+    elStatus.style.color = "#fbbf24";
   });
 
-  // Buttons
-  document.getElementById('ledOn').addEventListener('click', () => {
-    client.publish(topicLed, 'ON');
+  client.on("error", () => {
+    elStatus.textContent = "error";
+    elStatus.style.color = "#ef4444";
   });
-  document.getElementById('ledOff').addEventListener('click', () => {
-    client.publish(topicLed, 'OFF');
+
+  client.on("message", (topic, message) => {
+    let m = message.toString();
+    if (topic === topicTemp) elTemp.textContent = m + " °C";
+    if (topic === topicHum)  elHum.textContent  = m + " %";
+    if (topic === topicPres) elPres.textContent = m + " hPa";
+    if (topic === topicAlt)  elAlt.textContent  = m + " m";
   });
+
+  // LED CONTROL BUTTONS
+  document.getElementById("ledOn").onclick  = () => client.publish(topicLed, "ON");
+  document.getElementById("ledOff").onclick = () => client.publish(topicLed, "OFF");
 </script>
+
 </body>
 </html>
