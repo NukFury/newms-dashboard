@@ -48,7 +48,6 @@
 
     #status { font-weight: bold; color: #38bdf8; }
 
-    /* Toggle Switch CSS */
     .switch {
       position: relative;
       display: inline-block;
@@ -120,6 +119,13 @@
       <div class="sensor-label">Altitude</div>
       <div id="alt" class="sensor-value">-- m</div>
     </div>
+
+    <!-- ⭐ NEW RAIN SENSOR CARD -->
+    <div class="sensor-box">
+      <div class="sensor-label">Rain Level</div>
+      <div id="rain" class="sensor-value">--</div>
+    </div>
+
   </div>
 </div>
 
@@ -147,7 +153,8 @@
   const topicHum  = "newms/weather/humidity";
   const topicPres = "newms/weather/pressure";
   const topicAlt  = "newms/weather/altitude";
-  const topicBuzz = "newms/device/led"; // same topic used by dashboard
+  const topicRain = "newms/weather/rain";   // ⭐ NEW TOPIC
+  const topicBuzz = "newms/device/led";
   const topicStatus = "newms/device/status";
 
   const client = mqtt.connect(`wss://${host}:${wsPort}/mqtt`, {
@@ -161,23 +168,17 @@
   const elHum  = document.getElementById("hum");
   const elPres = document.getElementById("pres");
   const elAlt  = document.getElementById("alt");
+  const elRain = document.getElementById("rain"); // ⭐ NEW ELEMENT
   const elStatus = document.getElementById("status");
   const buzzerSwitch = document.getElementById("buzzerSwitch");
 
   client.on("connect", () => {
     elStatus.textContent = "connected";
     elStatus.style.color = "#22c55e";
-    client.subscribe([topicTemp, topicHum, topicPres, topicAlt, topicStatus, topicBuzz]);
-  });
-
-  client.on("reconnect", () => {
-    elStatus.textContent = "reconnecting...";
-    elStatus.style.color = "#fbbf24";
-  });
-
-  client.on("error", () => {
-    elStatus.textContent = "error";
-    elStatus.style.color = "#ef4444";
+    client.subscribe([
+      topicTemp, topicHum, topicPres, topicAlt, topicRain,
+      topicStatus, topicBuzz
+    ]);
   });
 
   client.on("message", (topic, msg) => {
@@ -188,17 +189,15 @@
     if (topic === topicPres) elPres.textContent = m + " hPa";
     if (topic === topicAlt)  elAlt.textContent  = m + " m";
 
-    // Sync switch with buzzer state
+    if (topic === topicRain) elRain.textContent = m;  // ⭐ RAIN DISPLAY
+
     if (topic === topicBuzz) {
-      if (m === "ON") buzzerSwitch.checked = true;
-      else buzzerSwitch.checked = false;
+      buzzerSwitch.checked = (m === "ON");
     }
   });
 
-  // Toggle switch event
   buzzerSwitch.addEventListener("change", () => {
-    if (buzzerSwitch.checked) client.publish(topicBuzz, "ON");
-    else client.publish(topicBuzz, "OFF");
+    client.publish(topicBuzz, buzzerSwitch.checked ? "ON" : "OFF");
   });
 </script>
 
