@@ -136,6 +136,11 @@
       <div id="wind" class="sensor-value">-- km/h</div>
     </div>
 
+    <div class="sensor-box">
+      <div class="sensor-label">Wind Direction</div>
+      <div id="windDir" class="sensor-value">--</div>
+    </div>
+
   </div>
 </div>
 
@@ -168,6 +173,7 @@
   const topicBuzz = "newms/device/led";
   const topicStatus = "newms/device/status";
   const topicWind = "newms/weather/wind";
+  const topicWindDir = "newms/weather/winddir";
 
   const client = mqtt.connect(`wss://${host}:${wsPort}/mqtt`, {
     username,
@@ -184,13 +190,14 @@
   const elLDR = document.getElementById("ldrIcon"); // 🌞 NEW
   const elStatus = document.getElementById("status");
   const elWind = document.getElementById("wind");
+  const elWindDir = document.getElementById("windDir");
   const buzzerSwitch = document.getElementById("buzzerSwitch");
 
   client.on("connect", () => {
     elStatus.textContent = "connected";
     elStatus.style.color = "#22c55e";
     client.subscribe([
-      topicTemp, topicHum, topicPres, topicAlt, topicRain, topicLDR, topicWind,
+      topicTemp, topicHum, topicPres, topicAlt, topicRain, topicLDR, topicWind, topicWindDir,
       topicStatus, topicBuzz
     ]);
   });
@@ -219,6 +226,10 @@
     if (topic === topicBuzz) {
       buzzerSwitch.checked = (m === "ON");
     }
+
+    if (topic === topicWindDir) {
+      elWindDir.textContent = m;  // e.g., "NORTH", "SOUTH", etc.
+    }
   });
 
   buzzerSwitch.addEventListener("change", () => {
@@ -228,6 +239,7 @@
 
 </body>
 </html>
+
 
 
 
