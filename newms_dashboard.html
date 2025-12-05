@@ -120,10 +120,10 @@
       <div id="alt" class="sensor-value">-- m</div>
     </div>
 
-    <!-- ⭐ NEW RAIN SENSOR CARD -->
+    <!-- ⭐ RAIN CARD (ICON) -->
     <div class="sensor-box">
-      <div class="sensor-label">Rain Level</div>
-      <div id="rain" class="sensor-value">--</div>
+      <div class="sensor-label">Rain Status</div>
+      <div id="rainIcon" class="sensor-value">☀️</div>
     </div>
 
   </div>
@@ -153,7 +153,7 @@
   const topicHum  = "newms/weather/humidity";
   const topicPres = "newms/weather/pressure";
   const topicAlt  = "newms/weather/altitude";
-  const topicRain = "newms/weather/rain";   // ⭐ NEW TOPIC
+  const topicRain = "newms/weather/rain";   // 🌧 RAIN TOPIC
   const topicBuzz = "newms/device/led";
   const topicStatus = "newms/device/status";
 
@@ -168,7 +168,7 @@
   const elHum  = document.getElementById("hum");
   const elPres = document.getElementById("pres");
   const elAlt  = document.getElementById("alt");
-  const elRain = document.getElementById("rain"); // ⭐ NEW ELEMENT
+  const rainIcon = document.getElementById("rainIcon");
   const elStatus = document.getElementById("status");
   const buzzerSwitch = document.getElementById("buzzerSwitch");
 
@@ -189,7 +189,13 @@
     if (topic === topicPres) elPres.textContent = m + " hPa";
     if (topic === topicAlt)  elAlt.textContent  = m + " m";
 
-    if (topic === topicRain) elRain.textContent = m;  // ⭐ RAIN DISPLAY
+    if (topic === topicRain) {
+      if (m === "RAIN") {
+        rainIcon.textContent = "🌧";
+      } else {
+        rainIcon.textContent = "☀️";
+      }
+    }
 
     if (topic === topicBuzz) {
       buzzerSwitch.checked = (m === "ON");
