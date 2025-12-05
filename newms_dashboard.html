@@ -126,6 +126,11 @@
       <div id="rainIcon" class="sensor-value">☀️</div>
     </div>
 
+    <div class="sensor-box">
+      <div class="sensor-label">Light Status</div>
+      <div id="ldrIcon" class="sensor-value">🌞</div>
+    </div>
+
   </div>
 </div>
 
@@ -154,6 +159,7 @@
   const topicPres = "newms/weather/pressure";
   const topicAlt  = "newms/weather/altitude";
   const topicRain = "newms/weather/rain";   // 🌧 RAIN TOPIC
+  const topicLDR  = "newms/weather/ldr";    // 🌞 LDR TOPIC
   const topicBuzz = "newms/device/led";
   const topicStatus = "newms/device/status";
 
@@ -169,6 +175,7 @@
   const elPres = document.getElementById("pres");
   const elAlt  = document.getElementById("alt");
   const rainIcon = document.getElementById("rainIcon");
+  const elLDR = document.getElementById("ldrIcon"); // 🌞 NEW
   const elStatus = document.getElementById("status");
   const buzzerSwitch = document.getElementById("buzzerSwitch");
 
@@ -196,7 +203,11 @@
         rainIcon.textContent = "☀️";
       }
     }
-
+    // 🌞 LDR light/dark icon
+    if (topic === topicLDR) {
+      elLDR.textContent = (m === "BRIGHT") ? "🌞" : "🌙";
+    }
+    
     if (topic === topicBuzz) {
       buzzerSwitch.checked = (m === "ON");
     }
@@ -209,3 +220,4 @@
 
 </body>
 </html>
+
