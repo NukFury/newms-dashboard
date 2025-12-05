@@ -131,6 +131,11 @@
       <div id="ldrIcon" class="sensor-value">🌞</div>
     </div>
 
+    <div class="sensor-box">
+      <div class="sensor-label">Wind Speed</div>
+      <div id="wind" class="sensor-value">-- km/h</div>
+    </div>
+
   </div>
 </div>
 
@@ -162,6 +167,7 @@
   const topicLDR  = "newms/weather/ldr";    // 🌞 LDR TOPIC
   const topicBuzz = "newms/device/led";
   const topicStatus = "newms/device/status";
+  const topicWind = "newms/weather/wind";
 
   const client = mqtt.connect(`wss://${host}:${wsPort}/mqtt`, {
     username,
@@ -177,13 +183,14 @@
   const rainIcon = document.getElementById("rainIcon");
   const elLDR = document.getElementById("ldrIcon"); // 🌞 NEW
   const elStatus = document.getElementById("status");
+  const elWind = document.getElementById("wind");
   const buzzerSwitch = document.getElementById("buzzerSwitch");
 
   client.on("connect", () => {
     elStatus.textContent = "connected";
     elStatus.style.color = "#22c55e";
     client.subscribe([
-      topicTemp, topicHum, topicPres, topicAlt, topicRain, topicLDR,
+      topicTemp, topicHum, topicPres, topicAlt, topicRain, topicLDR, topicWind,
       topicStatus, topicBuzz
     ]);
   });
@@ -195,6 +202,7 @@
     if (topic === topicHum)  elHum.textContent  = m + " %";
     if (topic === topicPres) elPres.textContent = m + " hPa";
     if (topic === topicAlt)  elAlt.textContent  = m + " m";
+    if (topic === topicWind) elWind.textContent = m + " km/h";
 
     if (topic === topicRain) {
       if (m === "RAIN") {
@@ -220,6 +228,7 @@
 
 </body>
 </html>
+
 
 
 
