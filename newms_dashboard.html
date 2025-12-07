@@ -1,145 +1,94 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>NEWMS Weather Dashboard</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NEWMS Weather Dashboard</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: "Inter", sans-serif;
-      background: radial-gradient(circle at top, #1e293b, #0f172a 70%);
-      color: #f1f5f9;
-    }
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top, #1e293b, #0f172a 70%);
+  color: #f1f5f9;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 25px;
-      font-size: 36px;
-      font-weight: 800;
-      background: linear-gradient(to right, #38bdf8, #3b82f6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 36px;
+  font-weight: 800;
+  background: linear-gradient(to right, #38bdf8, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-    .card {
-      background: rgba(255, 255, 255, 0.06);
-      padding: 22px;
-      margin: 18px 0;
-      border-radius: 18px;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 22px;
+  margin: 18px 0;
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 18px;
-    }
+.grid {
+  display: grid;
+  gap: 18px;
+}
 
-    .sensor-box {
-      text-align: center;
-      padding: 18px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.08);
-      transition: 0.3s ease;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
 
-    .sensor-box:hover {
-      background: rgba(255,255,255,0.15);
-      transform: translateY(-3px);
-    }
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
 
-    .sensor-label {
-      opacity: 0.75;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
+.sensor-box {
+  text-align: center;
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  transition: 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.08);
+}
 
-    .sensor-value {
-      font-size: 32px;
-      font-weight: 700;
-    }
+.sensor-box:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-3px);
+}
 
-    .icon {
-      font-size: 40px;
-      margin-bottom: 5px;
-      display: block;
-    }
+.sensor-label { opacity: 0.75; font-size: 14px; margin-bottom: 6px; }
+.sensor-value { font-size: 32px; font-weight: 700; }
+.icon { font-size: 40px; margin-bottom: 5px; display: block; }
 
-    /* BIG WIND CARDS */
-    .wind-box {
-      text-align: center;
-      padding: 30px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+.wind-box {
+  text-align: center;
+  padding: 30px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
 
-    .wind-big-value {
-      font-size: 48px;
-      font-weight: 800;
-      margin-top: 10px;
-    }
+.wind-big-value { font-size: 48px; font-weight: 800; margin-top: 10px; }
+.wind-label { font-size: 18px; opacity: 0.75; }
 
-    .wind-label {
-      font-size: 18px;
-      opacity: 0.75;
-    }
+.switch { position: relative; width: 60px; height: 34px; display: inline-block; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background-color: #64748b; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; border-radius: 50%; transition: .4s; }
+input:checked + .slider { background-color: #3b82f6; }
+input:checked + .slider:before { transform: translateX(26px); }
 
-    /* Switch style */
-    .switch {
-      position: relative;
-      width: 60px;
-      height: 34px;
-      display: inline-block;
-    }
+#status { font-weight: 700; }
+</style>
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background-color: #64748b;
-      transition: .4s;
-      border-radius: 34px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 26px;
-      width: 26px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      border-radius: 50%;
-      transition: .4s;
-    }
-
-    input:checked + .slider {
-      background-color: #3b82f6;
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-
-    #status { font-weight: 700; }
-  </style>
-
-  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
 
@@ -148,8 +97,8 @@
 <!-- SENSOR PANEL -->
 <div class="card">
 
-  <!-- ROW 1 -->
-  <div class="grid">
+  <!-- Top Row: Temperature, Humidity, Pressure -->
+  <div class="grid grid-3">
     <div class="sensor-box">
       <span class="icon">🌡️</span>
       <div class="sensor-label">Temperature</div>
@@ -167,10 +116,10 @@
       <div class="sensor-label">Pressure</div>
       <div id="pres" class="sensor-value">-- hPa</div>
     </div>
+  </div>
 
-
-  <!-- ROW 2 (Rain + Light) -->
-  <div class="grid" style="margin-top:20px;">
+  <!-- Middle Row: Rain + Light Status -->
+  <div class="grid grid-2" style="margin-top:20px;">
     <div class="sensor-box">
       <div class="sensor-label">Rain Status</div>
       <div id="rainIcon" class="sensor-value">☀️</div>
@@ -182,8 +131,8 @@
     </div>
   </div>
 
-  <!-- ROW 3 (WIND BIG VISUALS) -->
-  <div class="grid" style="margin-top:30px;">
+  <!-- Bottom Row: Wind Speed + Direction -->
+  <div class="grid grid-2" style="margin-top:30px;">
     <div class="wind-box">
       <span class="icon" style="font-size:50px;">💨</span>
       <div class="wind-label">Wind Speed</div>
@@ -213,77 +162,88 @@
   MQTT Status:
   <span id="status" style="color:#f87171">disconnected</span>
 </div>
+
 <script>
-  const host = "e1bf1fc970844046bc62def2d86789c0.s1.eu.hivemq.cloud";
-  const wsPort = 8884;
-  const username = "esp32_client";
-  const password = "Esp123456";
+const host = "e1bf1fc970844046bc62def2d86789c0.s1.eu.hivemq.cloud";
+const wsPort = 8884;
+const username = "esp32_client";
+const password = "Esp123456";
 
-  const topicTemp = "newms/weather/temperature";
-  const topicHum = "newms/weather/humidity";
-  const topicPres = "newms/weather/pressure";
-  const topicRain = "newms/weather/rain";
-  const topicLDR = "newms/weather/ldr";
-  const topicBuzz = "newms/device/led";
-  const topicStatus = "newms/device/status";
-  const topicWind = "newms/weather/wind";
-  const topicWindDir = "newms/weather/winddir";
+const topicTemp = "newms/weather/temperature";
+const topicHum = "newms/weather/humidity";
+const topicPres = "newms/weather/pressure";
+const topicRain = "newms/weather/rain";
+const topicLDR = "newms/weather/ldr";
+const topicBuzz = "newms/device/led";
+const topicStatus = "newms/device/status";
+const topicWind = "newms/weather/wind";
+const topicWindDir = "newms/weather/winddir";
 
-  const client = mqtt.connect(`wss://${host}:${wsPort}/mqtt`, {
-    username,
-    password,
-    reconnectPeriod: 2000,
-    clean: true
-  });
+const client = mqtt.connect(`wss://${host}:${wsPort}/mqtt`, {
+  username,
+  password,
+  reconnectPeriod: 2000,
+  clean: true
+});
 
-  const elTemp = document.getElementById("temp");
-  const elHum = document.getElementById("hum");
-  const elPres = document.getElementById("pres");
-  const elWind = document.getElementById("wind");
-  const elWindDir = document.getElementById("windDir");
-  const rainIcon = document.getElementById("rainIcon");
-  const elLDR = document.getElementById("ldrIcon");
-  const elStatus = document.getElementById("status");
-  const buzzerSwitch = document.getElementById("buzzerSwitch");
+const elTemp = document.getElementById("temp");
+const elHum = document.getElementById("hum");
+const elPres = document.getElementById("pres");
+const elWind = document.getElementById("wind");
+const elWindDir = document.getElementById("windDir");
+const rainIcon = document.getElementById("rainIcon");
+const elLDR = document.getElementById("ldrIcon");
+const elStatus = document.getElementById("status");
+const buzzerSwitch = document.getElementById("buzzerSwitch");
 
-  client.on("connect", () => {
-    elStatus.textContent = "connected";
-    elStatus.style.color = "#22c55e";
+client.on("connect", () => {
+  elStatus.textContent = "connected";
+  elStatus.style.color = "#22c55e";
 
-    client.subscribe([
-      topicTemp, topicHum, topicPres,
-      topicRain, topicLDR, topicWind, topicWindDir,
-      topicBuzz, topicStatus
-    ]);
-  });
+  client.subscribe([
+    topicTemp, topicHum, topicPres,
+    topicRain, topicLDR, topicWind, topicWindDir,
+    topicBuzz, topicStatus
+  ]);
+});
 
-  client.on("message", (topic, msg) => {
-    let m = msg.toString();
+client.on("message", (topic, msg) => {
+  let m = msg.toString();
 
-    if (topic === topicTemp) elTemp.textContent = m + " °C";
-    if (topic === topicHum)  elHum.textContent = m + " %";
-    if (topic === topicPres) elPres.textContent = m + " hPa";
-    if (topic === topicWind) elWind.textContent = m + " km/h";
+  if (topic === topicTemp) elTemp.textContent = m + " °C";
+  if (topic === topicHum)  elHum.textContent = m + " %";
+  if (topic === topicPres) elPres.textContent = m + " hPa";
+  if (topic === topicWind) elWind.textContent = m + " km/h";
+  if (topic === topicWindDir) elWindDir.textContent = m;
+  if (topic === topicRain) rainIcon.textContent = (m === "RAIN") ? "🌧️" : "☀️";
 
-    if (topic === topicRain)
-      rainIcon.textContent = (m === "RAIN") ? "🌧️" : "☀️";
+  if (topic === topicLDR) {
+    elLDR.textContent = (m === "BRIGHT") ? "🌞" : "🌙";
 
-    if (topic === topicLDR)
-      elLDR.textContent = (m === "BRIGHT") ? "🌙" : "🌞";
+    // Switch dashboard mode based on light sensor
+    if (m === "BRIGHT") {
+      // It's bright → Day mode
+      document.body.style.background = "radial-gradient(circle at top, #1e293b, #0f172a 70%)";
+      document.querySelectorAll('.card').forEach(card => {
+        card.style.background = "rgba(255,255,255,0.06)";
+      });
+    } else {
+      // It's dark → Night mode
+      document.body.style.background = "radial-gradient(circle at top, #0f172a, #000000 80%)";
+      document.querySelectorAll('.card').forEach(card => {
+        card.style.background = "rgba(0,0,0,0.25)";
+      });
+    }
+  }
 
-    if (topic === topicWindDir)
-      elWindDir.textContent = m;
+  if (topic === topicBuzz) buzzerSwitch.checked = (m === "ON");
+});
 
-    if (topic === topicBuzz)
-      buzzerSwitch.checked = (m === "ON");
-  });
-
-  buzzerSwitch.addEventListener("change", () => {
-    client.publish(topicBuzz, buzzerSwitch.checked ? "ON" : "OFF");
-  });
+// Buzzer toggle
+buzzerSwitch.addEventListener("change", () => {
+  client.publish(topicBuzz, buzzerSwitch.checked ? "ON" : "OFF");
+});
 </script>
 
 </body>
 </html>
-
-
