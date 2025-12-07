@@ -5,57 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>NEWMS Weather Dashboard</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
       padding: 20px;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
+      font-family: "Inter", sans-serif;
+      background: radial-gradient(circle at top, #1e293b, #0f172a 70%);
       color: #f1f5f9;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 32px;
-      letter-spacing: 1px;
+      margin-bottom: 25px;
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(to right, #38bdf8, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 20px;
-      margin: 15px 0;
-      border-radius: 14px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 22px;
+      margin: 18px 0;
+      border-radius: 18px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
     }
 
     .sensor-box {
       text-align: center;
-      padding: 16px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.05);
+      padding: 18px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      transition: 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
-    .sensor-label { opacity: 0.8; }
-    .sensor-value { font-size: 32px; font-weight: bold; }
+    .sensor-box:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-3px);
+    }
 
-    #status { font-weight: bold; color: #38bdf8; }
+    .sensor-label {
+      opacity: 0.75;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
 
+    .sensor-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .icon {
+      font-size: 40px;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    /* BIG WIND CARDS */
+    .wind-box {
+      text-align: center;
+      padding: 30px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .wind-big-value {
+      font-size: 48px;
+      font-weight: 800;
+      margin-top: 10px;
+    }
+
+    .wind-label {
+      font-size: 18px;
+      opacity: 0.75;
+    }
+
+    /* Switch style */
     .switch {
       position: relative;
-      display: inline-block;
       width: 60px;
       height: 34px;
+      display: inline-block;
     }
 
-    .switch input { 
+    .switch input {
       opacity: 0;
       width: 0;
       height: 0;
@@ -64,22 +110,22 @@
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0; left: 0;
-      right: 0; bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
+      inset: 0;
+      background-color: #64748b;
+      transition: .4s;
       border-radius: 34px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 26px; width: 26px;
+      height: 26px;
+      width: 26px;
       left: 4px;
       bottom: 4px;
       background-color: white;
-      transition: 0.4s;
       border-radius: 50%;
+      transition: .4s;
     }
 
     input:checked + .slider {
@@ -89,6 +135,8 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
+
+    #status { font-weight: 700; }
   </style>
 
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
@@ -99,28 +147,36 @@
 
 <!-- SENSOR PANEL -->
 <div class="card">
+
+  <!-- ROW 1 -->
   <div class="grid">
     <div class="sensor-box">
+      <span class="icon">🌡️</span>
       <div class="sensor-label">Temperature</div>
       <div id="temp" class="sensor-value">-- °C</div>
     </div>
 
     <div class="sensor-box">
+      <span class="icon">💧</span>
       <div class="sensor-label">Humidity</div>
       <div id="hum" class="sensor-value">-- %</div>
     </div>
 
     <div class="sensor-box">
+      <span class="icon">📈</span>
       <div class="sensor-label">Pressure</div>
       <div id="pres" class="sensor-value">-- hPa</div>
     </div>
 
     <div class="sensor-box">
+      <span class="icon">⛰️</span>
       <div class="sensor-label">Altitude</div>
       <div id="alt" class="sensor-value">-- m</div>
     </div>
+  </div>
 
-    <!-- ⭐ RAIN CARD (ICON) -->
+  <!-- ROW 2 (Rain + Light) -->
+  <div class="grid" style="margin-top:20px;">
     <div class="sensor-box">
       <div class="sensor-label">Rain Status</div>
       <div id="rainIcon" class="sensor-value">☀️</div>
@@ -130,34 +186,39 @@
       <div class="sensor-label">Light Status</div>
       <div id="ldrIcon" class="sensor-value">🌞</div>
     </div>
-
-    <div class="sensor-box">
-      <div class="sensor-label">Wind Speed</div>
-      <div id="wind" class="sensor-value">-- km/h</div>
-    </div>
-
-    <div class="sensor-box">
-      <div class="sensor-label">Wind Direction</div>
-      <div id="windDir" class="sensor-value">--</div>
-    </div>
-
   </div>
+
+  <!-- ROW 3 (WIND BIG VISUALS) -->
+  <div class="grid" style="margin-top:30px;">
+    <div class="wind-box">
+      <span class="icon" style="font-size:50px;">💨</span>
+      <div class="wind-label">Wind Speed</div>
+      <div id="wind" class="wind-big-value">-- km/h</div>
+    </div>
+
+    <div class="wind-box">
+      <span class="icon" style="font-size:50px;">🧭</span>
+      <div class="wind-label">Direction</div>
+      <div id="windDir" class="wind-big-value">--</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- BUZZER CONTROL -->
 <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-  <strong>Buzzer Control</strong>
+  <strong style="font-size:18px;">🔔 Buzzer Control</strong>
   <label class="switch">
     <input type="checkbox" id="buzzerSwitch">
-    <span class="slider round"></span>
+    <span class="slider"></span>
   </label>
 </div>
 
 <!-- CONNECTION STATUS -->
 <div class="card">
-  MQTT Status: <span id="status">disconnected</span>
+  MQTT Status:
+  <span id="status" style="color:#f87171">disconnected</span>
 </div>
-
 <script>
   const host = "e1bf1fc970844046bc62def2d86789c0.s1.eu.hivemq.cloud";
   const wsPort = 8884;
@@ -165,11 +226,11 @@
   const password = "Esp123456";
 
   const topicTemp = "newms/weather/temperature";
-  const topicHum  = "newms/weather/humidity";
+  const topicHum = "newms/weather/humidity";
   const topicPres = "newms/weather/pressure";
-  const topicAlt  = "newms/weather/altitude";
-  const topicRain = "newms/weather/rain";   // 🌧 RAIN TOPIC
-  const topicLDR  = "newms/weather/ldr";    // 🌞 LDR TOPIC
+  const topicAlt = "newms/weather/altitude";
+  const topicRain = "newms/weather/rain";
+  const topicLDR = "newms/weather/ldr";
   const topicBuzz = "newms/device/led";
   const topicStatus = "newms/device/status";
   const topicWind = "newms/weather/wind";
@@ -183,22 +244,24 @@
   });
 
   const elTemp = document.getElementById("temp");
-  const elHum  = document.getElementById("hum");
+  const elHum = document.getElementById("hum");
   const elPres = document.getElementById("pres");
-  const elAlt  = document.getElementById("alt");
-  const rainIcon = document.getElementById("rainIcon");
-  const elLDR = document.getElementById("ldrIcon"); // 🌞 NEW
-  const elStatus = document.getElementById("status");
+  const elAlt = document.getElementById("alt");
   const elWind = document.getElementById("wind");
   const elWindDir = document.getElementById("windDir");
+  const rainIcon = document.getElementById("rainIcon");
+  const elLDR = document.getElementById("ldrIcon");
+  const elStatus = document.getElementById("status");
   const buzzerSwitch = document.getElementById("buzzerSwitch");
 
   client.on("connect", () => {
     elStatus.textContent = "connected";
     elStatus.style.color = "#22c55e";
+
     client.subscribe([
-      topicTemp, topicHum, topicPres, topicAlt, topicRain, topicLDR, topicWind, topicWindDir,
-      topicStatus, topicBuzz
+      topicTemp, topicHum, topicPres, topicAlt,
+      topicRain, topicLDR, topicWind, topicWindDir,
+      topicBuzz, topicStatus
     ]);
   });
 
@@ -206,30 +269,22 @@
     let m = msg.toString();
 
     if (topic === topicTemp) elTemp.textContent = m + " °C";
-    if (topic === topicHum)  elHum.textContent  = m + " %";
+    if (topic === topicHum)  elHum.textContent = m + " %";
     if (topic === topicPres) elPres.textContent = m + " hPa";
-    if (topic === topicAlt)  elAlt.textContent  = m + " m";
+    if (topic === topicAlt)  elAlt.textContent = m + " m";
     if (topic === topicWind) elWind.textContent = m + " km/h";
 
-    if (topic === topicRain) {
-      if (m === "RAIN") {
-        rainIcon.textContent = "🌧";
-      } else {
-        rainIcon.textContent = "☀️";
-      }
-    }
-    // 🌞 LDR light/dark icon
-    if (topic === topicLDR) {
-      elLDR.textContent = (m === "BRIGHT") ? "🌙" : "🌞";
-    }
-    
-    if (topic === topicBuzz) {
-      buzzerSwitch.checked = (m === "ON");
-    }
+    if (topic === topicRain)
+      rainIcon.textContent = (m === "RAIN") ? "🌧️" : "☀️";
 
-    if (topic === topicWindDir) {
-      elWindDir.textContent = m;  // e.g., "NORTH", "SOUTH", etc.
-    }
+    if (topic === topicLDR)
+      elLDR.textContent = (m === "BRIGHT") ? "🌙" : "🌞";
+
+    if (topic === topicWindDir)
+      elWindDir.textContent = m;
+
+    if (topic === topicBuzz)
+      buzzerSwitch.checked = (m === "ON");
   });
 
   buzzerSwitch.addEventListener("change", () => {
@@ -239,8 +294,3 @@
 
 </body>
 </html>
-
-
-
-
-
