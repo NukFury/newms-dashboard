@@ -222,7 +222,6 @@
   const topicTemp = "newms/weather/temperature";
   const topicHum = "newms/weather/humidity";
   const topicPres = "newms/weather/pressure";
-  const topicAlt = "newms/weather/altitude";
   const topicRain = "newms/weather/rain";
   const topicLDR = "newms/weather/ldr";
   const topicBuzz = "newms/device/led";
@@ -240,7 +239,6 @@
   const elTemp = document.getElementById("temp");
   const elHum = document.getElementById("hum");
   const elPres = document.getElementById("pres");
-  const elAlt = document.getElementById("alt");
   const elWind = document.getElementById("wind");
   const elWindDir = document.getElementById("windDir");
   const rainIcon = document.getElementById("rainIcon");
@@ -253,7 +251,7 @@
     elStatus.style.color = "#22c55e";
 
     client.subscribe([
-      topicTemp, topicHum, topicPres, topicAlt,
+      topicTemp, topicHum, topicPres,
       topicRain, topicLDR, topicWind, topicWindDir,
       topicBuzz, topicStatus
     ]);
@@ -265,7 +263,6 @@
     if (topic === topicTemp) elTemp.textContent = m + " °C";
     if (topic === topicHum)  elHum.textContent = m + " %";
     if (topic === topicPres) elPres.textContent = m + " hPa";
-    if (topic === topicAlt)  elAlt.textContent = m + " m";
     if (topic === topicWind) elWind.textContent = m + " km/h";
 
     if (topic === topicRain)
@@ -288,4 +285,5 @@
 
 </body>
 </html>
+
 
